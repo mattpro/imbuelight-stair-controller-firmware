@@ -1,0 +1,55 @@
+{
+    "version": "2.0.0",
+    
+    "tasks": [
+        {
+            "label": "FLASH J-Link",
+            "type": "shell",
+            "command": "C:/Program Files/SEGGER/JLink/JLink.exe",
+            "args": [
+                "-device",
+                "RP2040_M0_0",
+                "-if",
+                "SWD",
+                "-speed",
+                "4000",
+                "-CommandFile",
+                "${workspaceRoot}/imbuelight_stair_controller_fw/jlink/flash.jlink"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "RESET J-Link",
+            "type": "shell",
+            "command": "C:/Program Files/SEGGER/JLink/JLink.exe",
+            "args": [
+                "-device",
+                "RP2040_M0_0",
+                "-if",
+                "SWD",
+                "-speed",
+                "4000",
+                "-CommandFile",
+                "${workspaceRoot}/imbuelight_stair_controller_fw/jlink/reset.jlink"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "ERASE - J-link",
+            "type": "shell",
+            "command": "C:/Program Files/SEGGER/JLink/JLink.exe",
+            "args": [
+                "-device",
+                "RP2040_M0_0",
+                "-if",
+                "SWD",
+                "-speed",
+                "4000",
+                "-CommandFile",
+                "${workspaceRoot}/imbuelight_stair_controller_fw/jlink/reset.jlink"
+            ],
+            "problemMatcher": []
+        }
+    ]
+  }
+  
