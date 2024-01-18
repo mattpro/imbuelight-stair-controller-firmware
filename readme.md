@@ -1,5 +1,10 @@
 ## Build in WSL
 
+0. Init submodule
+```
+git submodule update --init --recursive
+```
+
 1. Make sure that env PICO_SDK_PATH is set
 
 ```

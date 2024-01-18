@@ -4,7 +4,7 @@
     },
 
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
-    "cmake.sourceDirectory": "${workspaceFolder}/imbuelight_stair_controller_fw",
+    "cmake.sourceDirectory": "D:/LocalRepo/imbue_light/imbuelight-stair-controller-firmware/application",
     "files.associations": {
         "cyw43_arch.h": "c",
         "ssd1306_conf.h": "c",
@@ -31,6 +31,7 @@
         }
     },
     "cmake.buildBeforeRun": false,
-    "cortex-debug.openocdPath": "C:/tools/openocd/openocd.exe"
+    "cortex-debug.openocdPath": "C:/tools/openocd/openocd.exe",
+    "cmake.configureOnOpen": true
 
 }
