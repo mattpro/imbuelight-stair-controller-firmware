@@ -1,6 +1,7 @@
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 #include "hardware/pwm.h"
+#include "hardware/flash.h"
 #include "pwm.pio.h"
 //#include "pico/cyw43_arch.h"
 #include "pwm.h"
@@ -10,6 +11,7 @@
 #include "io_exp.h"
 #include "utils.h"
 #include "rtt/RTT/SEGGER_RTT.h"
+#include "my_flash.h"
 
 
 #include "btstack.h"
@@ -30,11 +32,7 @@ typedef struct {
 } light_on_t;
 
 
-typedef struct {
-    uint8_t num_of_stairs;
-    uint16_t max_pwm_duty;
-    uint32_t stair_light_on_time_ms;
-} settings_t;
+
 
 
 typedef struct {
@@ -49,7 +47,6 @@ typedef struct {
 
 
 
-volatile settings_t settings;
 volatile light_on_t light_on;
 
 volatile stair_effect_t effect_1;
@@ -269,6 +266,9 @@ int main()
     SEGGER_RTT_WriteString(0,"### IMBUE LIGHT STAIR CONTROLLER VER 1.1 ###\r\n");
     SEGGER_RTT_printf(0, "###         %s %s         ###\r\n", __DATE__, __TIME__);
     SEGGER_RTT_WriteString(0,"############################################\r\n");
+    //SETTINGS_load_and_save_default();
+    SETTINGS_increase_reset_count();
+
 
 
     // STAIR Settings

@@ -14,7 +14,7 @@
                 "-speed",
                 "4000",
                 "-CommandFile",
-                "${workspaceRoot}/imbuelight_stair_controller_fw/jlink/flash.jlink"
+                "${workspaceRoot}/application/jlink/flash.jlink"
             ],
             "problemMatcher": []
         },
@@ -30,12 +30,12 @@
                 "-speed",
                 "4000",
                 "-CommandFile",
-                "${workspaceRoot}/imbuelight_stair_controller_fw/jlink/reset.jlink"
+                "${workspaceRoot}/application/jlink/reset.jlink"
             ],
             "problemMatcher": []
         },
         {
-            "label": "ERASE - J-link",
+            "label": "ERASE J-link",
             "type": "shell",
             "command": "C:/Program Files/SEGGER/JLink/JLink.exe",
             "args": [
@@ -46,7 +46,7 @@
                 "-speed",
                 "4000",
                 "-CommandFile",
-                "${workspaceRoot}/imbuelight_stair_controller_fw/jlink/reset.jlink"
+                "${workspaceRoot}/application/jlink/reset.jlink"
             ],
             "problemMatcher": []
         }

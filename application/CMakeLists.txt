@@ -14,7 +14,7 @@ pico_sdk_init()
 
 include_directories(src/rtt/Config src/rtt/RTT)
 
-include_directories(src/rtt/Config) # src/rtt/RTT)
+include_directories(src/rtt/Config) 
 
 add_executable(${PROJECT_NAME}
     src/main.c  
@@ -25,6 +25,7 @@ add_executable(${PROJECT_NAME}
     src/my_i2c.c
     src/io_exp.c
     src/utils.c
+    src/my_flash.c
     #src/rtt/RTT/SEGGER_RTT.c 
     #src/rtt/RTT/SEGGER_RTT_printf.c
     src/server_common.c
@@ -34,10 +35,11 @@ target_link_libraries(${PROJECT_NAME}
     pico_stdlib
     hardware_pio
     hardware_pwm
-    hardware_i2c    
+    hardware_i2c  
+    hardware_flash  
     pico_btstack_ble
     pico_btstack_cyw43
-    pico_cyw43_arch_none
+    pico_cyw43_arch_none  
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
