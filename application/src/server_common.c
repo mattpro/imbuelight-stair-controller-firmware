@@ -91,6 +91,11 @@ int att_write_callback(hci_con_handle_t connection_handle, uint16_t att_handle, 
     SEGGER_RTT_printf(0, "BLE write. Len=%d data=%s", buffer_size, buffer);
 
 
+    uint8_t cmd = buffer[0];
+    
+
+
+
    // if (att_handle != ATT_CHARACTERISTIC_ORG_BLUETOOTH_CHARACTERISTIC_TEMPERATURE_01_CLIENT_CONFIGURATION_HANDLE) return 0;
     le_notification_enabled = little_endian_read_16(buffer, 0) == GATT_CLIENT_CHARACTERISTICS_CONFIGURATION_NOTIFICATION;
     con_handle = connection_handle;

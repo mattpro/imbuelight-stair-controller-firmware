@@ -38,11 +38,12 @@ typedef struct {
 typedef struct {
     int step;                   // current effect step
     bool enable;                // enable effect
-    effect_dir_t dir;           // direction DIR_DOWN_TO_UP or DIR_UP_TO_DOWN
+    effect_dir_t dir;           // direction DIR_DOWN_TO_UP or DIR_UP_TO_DOWN    
+    turn_dir_t turn_dir;        // if enable effect goes on or off
     // settings
     uint16_t increment_step;    // speed of effect
     uint16_t wide;              // wide of effect
-    turn_dir_t turn_dir;        // if enable effect goes on or off
+
 } stair_effect_t;
 
 
