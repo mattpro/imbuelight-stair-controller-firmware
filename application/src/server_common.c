@@ -8,6 +8,7 @@
 #include "btstack.h"
 #include "server_common.h"
 #include "temp_sensor.h"
+#include "ble_communication.h"
 #include "rtt/RTT/SEGGER_RTT.h"
 
 #define APP_AD_FLAGS 0x06
@@ -93,6 +94,7 @@ int att_write_callback(hci_con_handle_t connection_handle, uint16_t att_handle, 
 
     uint8_t cmd = buffer[0];
     
+    BLE_COM_parse(buffer, buffer_size);
 
 
 

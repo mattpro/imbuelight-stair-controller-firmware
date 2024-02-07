@@ -26,20 +26,21 @@ Additional function
 1) Press switch to channel ON config
 
 
-COMMAND:                | PARAMETER:                      | DATA  
-------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
-SET PARAMETER - 0xDE    | num of stair:             0x01  | 1 byte value: 0-23                                                                              |
-                        | max pwm:                  0x02  | 2 byte value: 1 - 65535                                                                         |
-                        | light on time:            0x03  | 4 byte value: 1 - 4 294 967 295 ms                                                              |
-                        | effect number + settings: 0x04  | 1 byte value: 1 or 2 effect type + (effect settiings: 2 byte + 2 byte)                          |
-                        | set all:                  0xFF  | (num of stair 1 byte) + (max pwm 2 byte) + (light on time 4 byte) + (effect settings 5 byte)    |
-------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
-ACTION - 0xAA           | Press switch 1:           0xA1  |                                                                                                 |
-                        | Press switch 2:           0xB1  |                                                                                                 |
-                        | Sens top press:           0x01  |                                                                                                 |
-                        | Sens bottom press:        0x02  |                                                                                                 |
-------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
-ADDITIONAL FUN - 0xAF   | Switch to channel:        0x01  | (switch type - 1 byte) + (channel number - 1 byte) + (inverse - 1 byte) + (max brigh - 2 byte ) |
+| COMMAND:                | PARAMETER:                      | DATA  
+| ------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
+| SET PARAMETER - 0xDE    | num of stair:             0x01  | 1 byte value: 0-23                                                                              |
+|                         | max pwm:                  0x02  | 2 byte value: 1 - 65535                                                                         |
+|                         | light on time:            0x03  | 4 byte value: 1 - 4 294 967 295 ms                                                              |
+|                         | effect number + settings: 0x04  | 1 byte value: 1 or 2 effect type + (effect settiings: 2 byte + 2 byte)                          |
+|                         | set all + save:           0xFF  | (num of stair 1 byte) + (max pwm 2 byte) + (light on time 4 byte) + (effect settings 5 byte)    |
+|                         | save settings:            0xEE  |                                                                                                 |
+| ------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
+| ACTION - 0xAA           | Press switch 1:           0xA1  |                                                                                                 |
+|                         | Press switch 2:           0xB1  |                                                                                                 |
+|                         | Sens top press:           0x01  |                                                                                                 |
+|                         | Sens bottom press:        0x02  |                                                                                                 |
+| ------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
+| ADDITIONAL FUN - 0xAF   | Switch to channel:        0x01  | (switch type - 1 byte) + (channel number - 1 byte) + (inverse - 1 byte) + (max brigh - 2 byte ) |
 
 
 

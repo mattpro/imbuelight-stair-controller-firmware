@@ -23,7 +23,10 @@ typedef enum {
     PARAM_ACT_PRESS_BOTTOM_PRESS    = 0x02,
 
     PARAM_ADD_SWITCH_CHANNEL        = 0x01,
-} ble_cmd_t;
+} ble_param_t;
+
+
+void BLE_COM_parse(uint8_t* data, uint16_t len);
 
 
 
