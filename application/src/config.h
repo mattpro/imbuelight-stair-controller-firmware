@@ -18,6 +18,9 @@ typedef enum {
 } turn_dir_t;
 
 
+
+
+
 // PINOUT
 // Standard PWM
 #define PWM_CHANNEL_1_PIN       0   // Slice: 0 CH: A
@@ -53,5 +56,8 @@ typedef enum {
 // I2C pin
 #define I2C_SDA_PIN             20
 #define I2C_SCL_PIN             21
+
+
+#define MAX_NUM_STAIR 23
 
 #endif

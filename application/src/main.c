@@ -205,6 +205,24 @@ void sens_top_exit(void)
     SEGGER_RTT_WriteString(0,"Sensor top exit\r\n");   
 }
 
+void action_sensor_top(void)
+{
+    printf("Action: TOP");
+    SEGGER_RTT_WriteString(0,"Sensor top enter\r\n");   
+    light_on.light_off_counter = 0;
+    light_on.light_on_from_top_flag = false;
+    if ( ( light_on.light_on_from_top_flag == false ) && ( light_on.light_on_flag == false ) )
+    {
+        SEGGER_RTT_WriteString(0,"Light enter\r\n");
+        light_on.light_on_flag = true;
+        light_on.dir = DIR_UP_TO_DOWN;
+        effect_1_start(light_on.dir);
+    }  
+     light_on.light_on_from_top_flag = true;
+}
+
+
+
 void sens_bottom_enter(void)
 {
     SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
@@ -225,6 +243,27 @@ void sens_bottom_exit(void)
     light_on.light_on_from_bottom_flag = true;
     SEGGER_RTT_WriteString(0,"Sensor bottom exit\r\n"); 
 }
+
+
+
+void action_sensor_bottom(void)
+{
+    printf("Action: Bottom");
+    SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
+    light_on.light_off_counter = 0;
+    light_on.light_on_from_bottom_flag = false;
+    if ( ( light_on.light_on_from_bottom_flag == false ) && ( light_on.light_on_flag == false ) )
+    {
+        SEGGER_RTT_WriteString(0,"Light enter\r\n");
+        light_on.light_on_flag = true;
+        light_on.dir = DIR_DOWN_TO_UP;
+        effect_1_start(light_on.dir);
+        //effect_2_start();
+    } 
+    light_on.light_on_from_bottom_flag = true;
+    SEGGER_RTT_WriteString(0,"Sensor bottom exit\r\n"); 
+}
+
 
 bool led_state = false;
 
