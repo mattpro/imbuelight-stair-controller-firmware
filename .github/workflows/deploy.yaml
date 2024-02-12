@@ -39,5 +39,5 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
               name: u2f_file
-              path: ./${APP_NAME}.uf2
+              path: ${APP_NAME}.uf2
               
