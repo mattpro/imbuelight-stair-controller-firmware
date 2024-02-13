@@ -16,6 +16,8 @@ typedef enum {
     PARAM_SET_LIGHT_TIME            = 0x03, 
     PARAM_SET_EFFECT                = 0x04, 
     PARAM_SET_ALL_PARAM             = 0xFF, 
+    PARAM_SET_LOAD_AND_SAVE_DEFAULT = 0xDF,
+    PARAM_SET_SAVE_ALL              = 0xEE,
 
     PARAM_ACT_PRESS_SW_1            = 0xA1,
     PARAM_ACT_PRESS_SW_2            = 0xB1,

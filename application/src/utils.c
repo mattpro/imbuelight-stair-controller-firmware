@@ -1,7 +1,25 @@
+#include <stdio.h>
 #include "pico/stdlib.h"
 #include "utils.h"
 #include "config.h"
 
+
+void delay_boot_info(void)
+{
+    printf("############################################\r\n");
+    printf("### IMBUE LIGHT STAIR CONTROLLER VER %s ###\r\n", FW_VERSION);
+    printf( "###         %s %s         ###\r\n", __DATE__, __TIME__);
+    printf("############################################\r\n");
+}
+
+
+void boot_info_rtt(void)
+{
+    SEGGER_RTT_WriteString(0,"############################################\r\n");
+    SEGGER_RTT_printf(0,"### IMBUE LIGHT STAIR CONTROLLER VER %s ###\r\n", FW_VERSION);
+    SEGGER_RTT_printf(0, "###         %s %s         ###\r\n", __DATE__, __TIME__);
+    SEGGER_RTT_WriteString(0,"############################################\r\n");
+}
 
 
 void start_blink_led(void)

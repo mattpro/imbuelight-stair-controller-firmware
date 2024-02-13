@@ -33,6 +33,7 @@ Additional function
 |                         | light on time:            0x03  | 4 byte value: 1 - 4 294 967 295 ms                                                              |
 |                         | effect number + settings: 0x04  | 1 byte value: 1 or 2 effect type + (effect settiings: 2 byte + 2 byte)                          |
 |                         | set all + save:           0xFF  | (num of stair 1 byte) + (max pwm 2 byte) + (light on time 4 byte) + (effect settings 5 byte)    |
+|                         | load and save default     0xDF  |                                                                                                 |
 |                         | save settings:            0xEE  |                                                                                                 |
 | ------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
 | ACTION - 0xAA           | Press switch 1:           0xA1  |                                                                                                 |

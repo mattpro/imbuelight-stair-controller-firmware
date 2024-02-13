@@ -3,19 +3,13 @@
 
 #include "rtt/RTT/SEGGER_RTT.h"
 
+#define FW_VERSION "0.1"
+
+
 // SETTINGS
 #define GAMMA_FACTOR 4.0f
 
-// ENUM
-typedef enum {
-    DIR_DOWN_TO_UP,
-    DIR_UP_TO_DOWN
-} effect_dir_t;
 
-typedef enum {
-    TURN_ON,
-    TURN_OFF
-} turn_dir_t;
 
 
 

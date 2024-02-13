@@ -10,7 +10,14 @@
         "ssd1306_conf.h": "c",
         "pwm.pio.h": "c",
         "config.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "segger_rtt.h": "c",
+        "btstack_cyw43.h": "c",
+        "my_i2c.h": "c",
+        "pwm_pio.h": "c",
+        "btstack.h": "c",
+        "server_common.h": "c",
+        "temp_sensor.h": "c"
     },
 
     

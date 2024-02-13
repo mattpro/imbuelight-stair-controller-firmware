@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 #include "hardware/i2c.h"
 #include "config.h"
 
@@ -52,7 +54,7 @@ void I2C_read(uint16_t dev_add, uint16_t mem_add, uint8_t *pData, uint16_t data_
 {
     int ret;
 
-    ret = i2c_write_blocking(i2c_default, dev_add, &mem_add, 1, false);
+    ret = i2c_write_blocking(i2c_default, dev_add, (const uint8_t*)&mem_add, 1, false);
     if ( ret < 0 )
     {
         printf("i2c write error");

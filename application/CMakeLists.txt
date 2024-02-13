@@ -27,6 +27,7 @@ add_executable(${PROJECT_NAME}
     src/utils.c
     src/my_flash.c
     src/ble_communication.c
+    src/effects.c
     #src/rtt/RTT/SEGGER_RTT.c 
     #src/rtt/RTT/SEGGER_RTT_printf.c
     src/server_common.c

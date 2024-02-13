@@ -9,6 +9,8 @@
 #include "server_common.h"
 #include "temp_sensor.h"
 #include "ble_communication.h"
+#include "my_flash.h"
+
 #include "rtt/RTT/SEGGER_RTT.h"
 
 #define APP_AD_FLAGS 0x06
@@ -77,8 +79,35 @@ uint16_t att_read_callback(hci_con_handle_t connection_handle, uint16_t att_hand
 
     SEGGER_RTT_printf(0, "BLE read. Len=%d data=%s", buffer_size, buffer);
 
+    uint8_t data_to_send[18];
+    uint32_t data_pointer = 0;
+    
+    memcpy((void*)&data_to_send[0], (void*)&settings.reset_count, sizeof(uint32_t) );
+    data_pointer += sizeof(uint32_t);
+
+    memcpy((void*)&data_to_send[data_pointer], (void*)&settings.num_of_stairs, sizeof(uint8_t) );
+    data_pointer += sizeof(uint8_t);
+    
+    memcpy((void*)&data_to_send[data_pointer], (void*)&settings.max_pwm_duty, sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    
+    memcpy((void*)&data_to_send[data_pointer], (void*)&settings.stair_light_on_time_ms, sizeof(uint32_t) );
+    data_pointer += sizeof(uint32_t);
+
+    memcpy((void*)&data_to_send[data_pointer], (void*)&settings.selected_effect_number, sizeof(uint8_t) );
+    data_pointer += sizeof(uint8_t);
+
+    memcpy((void*)&data_to_send[data_pointer], (void*)&settings.effect1_settings_1, sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+
+    memcpy((void*)&data_to_send[data_pointer], (void*)&settings.effect1_settings_2, sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+
+    memcpy((void*)&data_to_send[data_pointer], (void*)&settings.effect2_settings_1, sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+
     //if (att_handle == ATT_CHARACTERISTIC_ORG_BLUETOOTH_CHARACTERISTIC_TEMPERATURE_01_VALUE_HANDLE){
-    //    return att_read_callback_handle_blob((const uint8_t *)&current_temp, sizeof(current_temp), offset, buffer, buffer_size);
+        return att_read_callback_handle_blob((const uint8_t *)&data_to_send, 18, offset, buffer, buffer_size);
     //}
     return 0;
 }
