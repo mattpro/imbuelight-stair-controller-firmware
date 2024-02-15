@@ -104,6 +104,8 @@ static void BLE_COM_parse_parameter_set(uint8_t* data, uint16_t len)
         break; 
         case PARAM_SET_LOAD_AND_SAVE_DEFAULT:
             SETTINGS_load_and_save_default();
+            SETTINGS_print_rtt();
+            SETTINGS_print_serial();
         break;
         case PARAM_SET_SAVE_ALL:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=PARAM_SAVEL_ALL\r\n");
