@@ -30,6 +30,15 @@ void BLE_COM_parse(uint8_t* data, uint16_t len)
         return;
     }
     ble_cmd = (ble_cmd_t)(data[0]);
+    printf("Recived new BLE");
+    printf("BLE CMD: %02X\r\n", data[0]);
+    printf("BLE PAR: %02X\r\n", data[1]);
+    if ( len > 2 )
+    {
+       printf("BLE DAT: %02X\r\n", data[2]); 
+    }
+    
+
     
     switch(ble_cmd)
     {
