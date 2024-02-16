@@ -8,9 +8,7 @@
 
 // SETTINGS
 #define GAMMA_FACTOR 4.0f
-
-
-
+#define MAIN_TIMER_LOOP_MS 2
 
 
 

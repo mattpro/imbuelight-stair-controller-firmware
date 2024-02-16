@@ -33,6 +33,12 @@ void BLE_COM_parse(uint8_t* data, uint16_t len)
     printf("Recived new BLE");
     printf("BLE CMD: %02X\r\n", data[0]);
     printf("BLE PAR: %02X\r\n", data[1]);
+
+    for ( int i = 0 ; i < (len - 2) ; i ++ )
+    {
+        printf("BLE DAT[%d]: %02X\r\n",i, data[2+i]); 
+    }
+
     if ( len > 2 )
     {
        printf("BLE DAT: %02X\r\n", data[2]); 
@@ -77,6 +83,7 @@ static void BLE_COM_parse_parameter_set(uint8_t* data, uint16_t len)
             else
             {
                 SEGGER_RTT_WriteString(0, "BLE COM: Wrong stair number\r\n");
+                printf("BLE COM: Wrong stair number\r\n");
             }
         break; 
         case PARAM_SET_MAX_PWM:
@@ -97,24 +104,56 @@ static void BLE_COM_parse_parameter_set(uint8_t* data, uint16_t len)
         break; 
         case PARAM_SET_EFFECT:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=SET_EFFECT\r\n");
+            uint8_t effect_number = data[1];
+            if ( ( effect_number == 1 ) || ( effect_number == 2 ) ) // We alredy have only two effect. TODO: need refactor
+            {
+                settings.selected_effect_number = effect_number;
+                SEGGER_RTT_printf(0, "BLE COM: SET_EFFECT=%d\r\n", effect_number);
+                printf("BLE COM: SET_EFFECT=%d\r\n", effect_number);
+            }
+            else
+            {
+                SEGGER_RTT_printf(0, "Wrong effect number\r\n");
+                printf("Wrong effect number\r\n");
+            }
 
+            if ( effect_number == 1 )
+            {
+                settings.effect1_settings_1 =  ( (uint16_t)data[2] << 8 ) | data[3];
+                settings.effect1_settings_2 =  ( (uint16_t)data[4] << 8 ) | data[5];
+                SEGGER_RTT_printf(0, "BLE COM: effect1_settings_1=%d\r\n", settings.effect1_settings_1 );
+                SEGGER_RTT_printf(0, "BLE COM: effect1_settings_2=%d\r\n", settings.effect1_settings_2 );
+                printf("BLE COM: effect1_settings_1=%d\r\n", settings.effect1_settings_1 );
+                printf("BLE COM: effect1_settings_2=%d\r\n", settings.effect1_settings_2 );
+            }
+            if ( effect_number == 2 ) // Effect 2 have only one setting
+            {
+                settings.effect2_settings_1 =  ( (uint16_t)data[2] << 8 ) | data[3];
+                SEGGER_RTT_printf(0, "BLE COM: effect2_settings_1=%d\r\n", settings.effect2_settings_1 );
+                printf("BLE COM: effect1_settings_2=%d\r\n", settings.effect1_settings_1 );
+            }
         break; 
         case PARAM_SET_ALL_PARAM:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=SET_ALL_PARAM\r\n");
+            printf("BLE COM: PARAM=SET_ALL_PARAM\r\n");
         break; 
         case PARAM_SET_LOAD_AND_SAVE_DEFAULT:
+            SEGGER_RTT_WriteString(0, "BLE COM: PARAM=PARAM_SET_LOAD_AND_SAVE_DEFAULT\r\n");
+            printf("BLE COM: PARAM=PARAM_SET_LOAD_AND_SAVE_DEFAULT\r\n");
             SETTINGS_load_and_save_default();
             SETTINGS_print_rtt();
             SETTINGS_print_serial();
         break;
         case PARAM_SET_SAVE_ALL:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=PARAM_SAVEL_ALL\r\n");
+            printf("BLE COM: PARAM=PARAM_SAVEL_ALL\r\n");
             SETTINGS_print_rtt();
             SETTINGS_print_serial();
             SETTINGS_save();
         break;
         default:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=Unknow\r\n");
+            printf("BLE COM: PARAM=Unknow\r\n");
         break;
     }    
 }
@@ -128,22 +167,25 @@ static void BLE_COM_parse_parameter_action(uint8_t* data, uint16_t len)
     {
         case PARAM_ACT_PRESS_SW_1:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=ACT_PRESS_SW_1\r\n");
-            printf("ACTION: SW1");
+            printf("BLE COM: PARAM=ACT_PRESS_SW_1\r\n");
         break; 
         case PARAM_ACT_PRESS_SW_2:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=ACT_PRESS_SW_2\r\n");
-            printf("ACTION: SW2");
+            printf("BLE COM: PARAM=ACT_PRESS_SW_2\r\n");
         break;
         case PARAM_ACT_PRESS_TOP_PRESS:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=ACT_PRESS_TOP_PRESS\r\n");
+            printf("BLE COM: PARAM=ACT_PRESS_TOP_PRESS\r\n");
             action_sensor_top();
         break; 
         case PARAM_ACT_PRESS_BOTTOM_PRESS:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=ACT_PRESS_BOTTOM_PRESS\r\n");
+            printf("BLE COM: PARAM=ACT_PRESS_BOTTOM_PRESS\r\n");
             action_sensor_bottom();
         break; 
         default:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=ACT Unknow\r\n");
+            printf("BLE COM: PARAM=ACT Unknow\r\n");
         break;
     }    
 }

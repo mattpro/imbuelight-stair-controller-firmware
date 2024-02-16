@@ -20,7 +20,7 @@ typedef struct {
     bool light_on_flag;
     bool light_on_from_top_flag;
     bool light_on_from_bottom_flag;
-    uint32_t light_off_counter;
+    uint32_t light_off_counter_ms;
     effect_dir_t dir;
 } light_on_t;
 

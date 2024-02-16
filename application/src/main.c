@@ -31,6 +31,7 @@ static volatile bool io_exp_pooling_flag = false;
 
 bool main_timer_callback(struct repeating_timer *t) // each 2ms
 {
+    // timer do poolidngu IO expandera
     io_exp_pooling_counter ++;
     if ( io_exp_pooling_counter > 50 )
     {
@@ -38,17 +39,20 @@ bool main_timer_callback(struct repeating_timer *t) // each 2ms
         io_exp_pooling_counter = 0;
     }
 
+    // Effect main loop (function pointer)
     stair_effect_event.effect_loop();
 
+    // Condition to turn on light
     if ( ( light_on.light_on_flag == true ) && ( ( light_on.light_on_from_top_flag == true ) || ( light_on.light_on_from_bottom_flag == true ) ) )
     {
-        light_on.light_off_counter ++;
-        if ( light_on.light_off_counter > settings.stair_light_on_time_ms/2 ) // time diveded by 2 because loop interval is 2ms
+        light_on.light_off_counter_ms = light_on.light_off_counter_ms * MAIN_TIMER_LOOP_MS;
+        if ( light_on.light_off_counter_ms > settings.stair_light_on_time_ms/2 ) // time diveded by 2 because loop interval is 2ms
         {
             SEGGER_RTT_WriteString(0,"Light exit\r\n");
+            printf("Light exit\r\n");
             light_on.dir == DIR_UP_TO_DOWN ? stair_effect_event.effect_end(DIR_UP_TO_DOWN) : stair_effect_event.effect_end(DIR_DOWN_TO_UP);
             light_on.light_on_flag = false;
-            light_on.light_off_counter = 0;
+            light_on.light_off_counter_ms = 0;
         }  
     }   
 
@@ -59,16 +63,16 @@ bool main_timer_callback(struct repeating_timer *t) // each 2ms
 void sens_top_enter(void)
 {
     SEGGER_RTT_WriteString(0,"Sensor top enter\r\n");   
-    light_on.light_off_counter = 0;
+    printf("Sensor top enter\r\n"); 
+    light_on.light_off_counter_ms = 0;
     light_on.light_on_from_top_flag = false;
     if ( ( light_on.light_on_from_top_flag == false ) && ( light_on.light_on_flag == false ) )
     {
         SEGGER_RTT_WriteString(0,"Light enter\r\n");
+        printf("Light enter\r\n");
         light_on.light_on_flag = true;
         light_on.dir = DIR_UP_TO_DOWN;
         stair_effect_event.effect_start(light_on.dir);
-        //effect_1_start(light_on.dir);
-        //effect_2_start();
     }  
 }
 
@@ -76,13 +80,14 @@ void sens_top_exit(void)
 {
     light_on.light_on_from_top_flag = true;
     SEGGER_RTT_WriteString(0,"Sensor top exit\r\n");   
+    printf("Sensor top exit\r\n");   
 }
 
 void action_sensor_top(void)
 {
     printf("Action: TOP");
     SEGGER_RTT_WriteString(0,"Sensor top enter\r\n");   
-    light_on.light_off_counter = 0;
+    light_on.light_off_counter_ms = 0;
     light_on.light_on_from_top_flag = false;
     if ( ( light_on.light_on_from_top_flag == false ) && ( light_on.light_on_flag == false ) )
     {
@@ -100,7 +105,8 @@ void action_sensor_top(void)
 void sens_bottom_enter(void)
 {
     SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
-    light_on.light_off_counter = 0;
+    printf("Sensor bottom enter\r\n");
+    light_on.light_off_counter_ms = 0;
     light_on.light_on_from_bottom_flag = false;
     if ( ( light_on.light_on_from_bottom_flag == false ) && ( light_on.light_on_flag == false ) )
     {
@@ -109,9 +115,6 @@ void sens_bottom_enter(void)
         light_on.dir = DIR_DOWN_TO_UP;
 
         stair_effect_event.effect_start(light_on.dir);
-
-        //effect_1_start(light_on.dir);
-        //effect_2_start();
     }  
 }
 
@@ -119,6 +122,7 @@ void sens_bottom_exit(void)
 {
     light_on.light_on_from_bottom_flag = true;
     SEGGER_RTT_WriteString(0,"Sensor bottom exit\r\n"); 
+    printf("Sensor bottom exit\r\n"); 
 }
 
 
@@ -127,7 +131,7 @@ void action_sensor_bottom(void)
 {
     printf("Action: Bottom");
     SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
-    light_on.light_off_counter = 0;
+    light_on.light_off_counter_ms = 0;
     light_on.light_on_from_bottom_flag = false;
     if ( ( light_on.light_on_from_bottom_flag == false ) && ( light_on.light_on_flag == false ) )
     {
@@ -141,7 +145,6 @@ void action_sensor_bottom(void)
 }
 
 
-bool led_state = false;
 
 
 // Related to bluetooth
@@ -189,7 +192,7 @@ int main()
     IO_EXP_reg_event_sens_top_cbfunc(sens_top_enter, sens_top_exit);
     IO_EXP_reg_event_sens_bottom_cbfunc(sens_bottom_enter, sens_bottom_exit);
 
-    add_repeating_timer_us(-2000, main_timer_callback, NULL, &main_timer);
+    add_repeating_timer_us(MAIN_TIMER_LOOP_MS * (-1000), main_timer_callback, NULL, &main_timer);
 
 
     if (cyw43_arch_init()) 
@@ -227,7 +230,7 @@ int main()
         { 
             io_exp_pooling_flag = false;
             counter++;
-            SEGGER_RTT_printf(0,"pooling io exp. C: %4d enable:%d light off counter: %d\r\n", counter, effect_1.enable, light_on.light_off_counter);
+            SEGGER_RTT_printf(0,"pooling io exp. C: %4d enable:%d light off counter: %d\r\n", counter, effect_1.enable, light_on.light_off_counter_ms);
             IO_EXP_pooling();
         }
     }
