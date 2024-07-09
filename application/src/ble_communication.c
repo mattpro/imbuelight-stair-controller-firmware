@@ -38,13 +38,6 @@ void BLE_COM_parse(uint8_t* data, uint16_t len)
     {
         printf("BLE DAT[%d]: %02X\r\n",i, data[2+i]); 
     }
-
-    if ( len > 2 )
-    {
-       printf("BLE DAT: %02X\r\n", data[2]); 
-    }
-    
-
     
     switch(ble_cmd)
     {
@@ -58,6 +51,10 @@ void BLE_COM_parse(uint8_t* data, uint16_t len)
         break;
         case COMMAND_ADDITIONAL:
             SEGGER_RTT_WriteString(0, "BLE COM: CMD=SET_ADDITIONAL\r\n");
+
+
+            
+
         break;
         default:
             SEGGER_RTT_WriteString(0, "BLE COM: CMD=SET Unknow\r\n");

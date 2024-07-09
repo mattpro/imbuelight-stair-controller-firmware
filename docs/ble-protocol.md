@@ -35,6 +35,9 @@ Additional function
 |                         | set all + save:           0xFF  | (num of stair 1 byte) + (max pwm 2 byte) + (light on time 4 byte) + (effect settings 5 byte)    |
 |                         | load and save default     0xDF  |                                                                                                 |
 |                         | save settings:            0xEE  |                                                                                                 |
+|                         | night mode settings:      0xAF  | 3 byte value: 1 - on/off 2-3 max night brightness                                               |
+|                         | night mode start:         0xA1  | 2 byte value: 1 - hour 2 - minute                                                               |
+|                         | night mode stop:          0xA0  | 2 byte value: 1 - hour 2 - minute                                                               |
 | ------------------------|---------------------------------|-------------------------------------------------------------------------------------------------|
 | ACTION - 0xAA           | Press switch 1:           0xA1  |                                                                                                 |
 |                         | Press switch 2:           0xB1  |                                                                                                 |

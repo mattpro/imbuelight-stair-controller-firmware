@@ -25,12 +25,14 @@ add_executable(${PROJECT_NAME}
     src/my_i2c.c
     src/io_exp.c
     src/utils.c
-    src/my_flash.c
+    src/settings.c
     src/ble_communication.c
     src/effects.c
+    src/additional_fun.c
     #src/rtt/RTT/SEGGER_RTT.c 
     #src/rtt/RTT/SEGGER_RTT_printf.c
     src/server_common.c
+    src/my_rtc.c
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -42,6 +44,7 @@ target_link_libraries(${PROJECT_NAME}
     pico_btstack_ble
     pico_btstack_cyw43
     pico_cyw43_arch_none  
+    hardware_rtc
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

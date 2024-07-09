@@ -33,6 +33,8 @@ typedef struct io_expander_evet
     void (*_button4_unpress)  (void);   
 }io_expander_event_t;
 
+extern void sens_top_enter(void);
+extern void sens_top_exit(void);
 
 // default function 
 void default_sens_top_enter(void)       {printf("Top enter\r\n");}
@@ -45,10 +47,17 @@ void default_sens_switch1_unpress(void) {printf("Switch 1 unpress\r\n");}
 void default_sens_switch2_press(void)   {printf("Switch 2 press\r\n");}
 void default_sens_switch2_unpress(void) {printf("Switch 2 unpress\r\n");}
 
-void default_sens_button1_press(void)   {printf("Button 1 press\r\n");}
-void default_sens_button1_unpress(void) {printf("Button 1 unpress\r\n");}
+//void default_sens_button1_press(void)   {printf("Button 1 press\r\n");}
+//void default_sens_button1_unpress(void) {printf("Button 1 unpress\r\n");}
+void default_sens_button1_press(void)   {sens_top_enter();}
+void default_sens_button1_unpress(void) {sens_top_exit();}
+
+//void default_sens_button2_press(void)   {printf("Button 2 press\r\n");}
+//void default_sens_button2_unpress(void) {printf("Button 2 unpress\r\n");}
 void default_sens_button2_press(void)   {printf("Button 2 press\r\n");}
 void default_sens_button2_unpress(void) {printf("Button 2 unpress\r\n");}
+
+
 void default_sens_button3_press(void)   {printf("Button 3 press\r\n");}
 void default_sens_button3_unpress(void) {printf("Button 3 unpress\r\n");}
 void default_sens_button4_press(void)   {printf("Button 4 press\r\n");}

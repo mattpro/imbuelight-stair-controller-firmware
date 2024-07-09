@@ -15,6 +15,8 @@ volatile stair_effect_t effect_1;
 volatile stair_effect_t effect_2;
 
 
+
+
 static void effect_1_start(effect_dir_t dir);
 static void effect_1_end(effect_dir_t dir);
 static void effect_1_loop(void);
@@ -27,9 +29,9 @@ static void effect_2_loop(void);
 
 stair_effect_event_t stair_effect_event =
 {
-    effect_1_start,
-    effect_1_end,
-    effect_1_loop,
+    effect_2_start,
+    effect_2_end,
+    effect_2_loop,
 };
 
 

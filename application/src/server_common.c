@@ -9,6 +9,7 @@
 #include "server_common.h"
 #include "temp_sensor.h"
 #include "ble_communication.h"
+#include "effects.h"
 #include "my_flash.h"
 
 #include "rtt/RTT/SEGGER_RTT.h"
@@ -106,8 +107,11 @@ uint16_t att_read_callback(hci_con_handle_t connection_handle, uint16_t att_hand
     memcpy((void*)&data_to_send[data_pointer], (void*)&settings.effect2_settings_1, sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
 
+    memcpy((void*)&data_to_send[data_pointer], (void*)&light_on.light_on_flag, sizeof(bool) );
+    data_pointer += sizeof(bool);
+    
     //if (att_handle == ATT_CHARACTERISTIC_ORG_BLUETOOTH_CHARACTERISTIC_TEMPERATURE_01_VALUE_HANDLE){
-        return att_read_callback_handle_blob((const uint8_t *)&data_to_send, 18, offset, buffer, buffer_size);
+        return att_read_callback_handle_blob((const uint8_t *)&data_to_send, data_pointer, offset, buffer, buffer_size);
     //}
     return 0;
 }

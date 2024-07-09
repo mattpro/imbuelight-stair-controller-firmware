@@ -2,6 +2,7 @@
 #include "hardware/pio.h"
 #include "hardware/pwm.h"
 #include "hardware/flash.h"
+#include "hardware/watchdog.h"
 #include "pwm.pio.h"
 //#include "pico/cyw43_arch.h"
 #include "pwm.h"
@@ -12,6 +13,7 @@
 #include "utils.h"
 #include "rtt/RTT/SEGGER_RTT.h"
 #include "my_flash.h"
+#include "my_rtc.h"
 #include "effects.h"
 
 #include "btstack.h"
@@ -25,7 +27,7 @@
 struct repeating_timer main_timer;
 struct repeating_timer io_pool_timer;
 
-static uint32_t io_exp_pooling_counter = 0;
+static volatile uint32_t io_exp_pooling_counter = 0;
 static volatile bool io_exp_pooling_flag = false;
 
 
@@ -45,8 +47,8 @@ bool main_timer_callback(struct repeating_timer *t) // each 2ms
     // Condition to turn on light
     if ( ( light_on.light_on_flag == true ) && ( ( light_on.light_on_from_top_flag == true ) || ( light_on.light_on_from_bottom_flag == true ) ) )
     {
-        light_on.light_off_counter_ms = light_on.light_off_counter_ms * MAIN_TIMER_LOOP_MS;
-        if ( light_on.light_off_counter_ms > settings.stair_light_on_time_ms/2 ) // time diveded by 2 because loop interval is 2ms
+        light_on.light_off_counter_ms += MAIN_TIMER_LOOP_MS;
+        if ( light_on.light_off_counter_ms > settings.stair_light_on_time_ms ) 
         {
             SEGGER_RTT_WriteString(0,"Light exit\r\n");
             printf("Light exit\r\n");
@@ -85,7 +87,7 @@ void sens_top_exit(void)
 
 void action_sensor_top(void)
 {
-    printf("Action: TOP");
+    printf("Action: TOP\r\n");
     SEGGER_RTT_WriteString(0,"Sensor top enter\r\n");   
     light_on.light_off_counter_ms = 0;
     light_on.light_on_from_top_flag = false;
@@ -95,7 +97,6 @@ void action_sensor_top(void)
         light_on.light_on_flag = true;
         light_on.dir = DIR_UP_TO_DOWN;
         stair_effect_event.effect_start(light_on.dir);
-        //effect_1_start(light_on.dir);
     }  
      light_on.light_on_from_top_flag = true;
 }
@@ -104,8 +105,8 @@ void action_sensor_top(void)
 
 void sens_bottom_enter(void)
 {
-    SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
     printf("Sensor bottom enter\r\n");
+    SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
     light_on.light_off_counter_ms = 0;
     light_on.light_on_from_bottom_flag = false;
     if ( ( light_on.light_on_from_bottom_flag == false ) && ( light_on.light_on_flag == false ) )
@@ -129,7 +130,7 @@ void sens_bottom_exit(void)
 
 void action_sensor_bottom(void)
 {
-    printf("Action: Bottom");
+    printf("Action: Bottom\r\n");
     SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
     light_on.light_off_counter_ms = 0;
     light_on.light_on_from_bottom_flag = false;
@@ -147,7 +148,7 @@ void action_sensor_bottom(void)
 
 
 
-// Related to bluetooth
+// // Related to bluetooth
 static btstack_timer_source_t heartbeat;
 static btstack_packet_callback_registration_t hci_event_callback_registration;
 
@@ -182,13 +183,16 @@ int main()
     start_blink_led();
     boot_info_rtt();
 
-    //SETTINGS_load_and_save_default();
+    SETTINGS_load_and_save_default();
     SETTINGS_load_and_increase_reset_count();
 
     PWM_HW_init();
     PWM_PIO_init();
     I2C_init();
     IO_EXP_init();
+
+    RTC_init();
+    
     IO_EXP_reg_event_sens_top_cbfunc(sens_top_enter, sens_top_exit);
     IO_EXP_reg_event_sens_bottom_cbfunc(sens_bottom_enter, sens_bottom_exit);
 
@@ -222,16 +226,33 @@ int main()
 
     delay_boot_info();
 
+
+    // Enable the watchdog, requiring the watchdog to be updated every 100ms or the chip will reboot
+    // second arg is pause on debug which means the watchdog will pause when stepping through code
+    watchdog_enable(1000, 0);
+
     while(1)
     {
         static uint32_t counter = 0;
 
-        if ( io_exp_pooling_flag == true)
+        
+
+        if ( io_exp_pooling_flag == true) // 100 ms
         { 
             io_exp_pooling_flag = false;
             counter++;
             SEGGER_RTT_printf(0,"pooling io exp. C: %4d enable:%d light off counter: %d\r\n", counter, effect_1.enable, light_on.light_off_counter_ms);
             IO_EXP_pooling();
+
+            if ( counter % 10 == 0 )
+            {
+                RTC_print_date_and_time();
+                static int led_on = true;
+                led_on = !led_on;
+                cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_on);
+            }
+
+            watchdog_update();
         }
     }
 }
