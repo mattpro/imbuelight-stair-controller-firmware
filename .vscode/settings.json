@@ -17,7 +17,9 @@
         "pwm_pio.h": "c",
         "btstack.h": "c",
         "server_common.h": "c",
-        "temp_sensor.h": "c"
+        "temp_sensor.h": "c",
+        "ble_communication.h": "c",
+        "effects.h": "c"
     },
 
     

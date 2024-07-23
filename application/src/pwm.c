@@ -3,6 +3,7 @@
 #include "hardware/pio.h"
 #include "hardware/pwm.h"
 #include "hardware/clocks.h"
+#include "settings.h"
 #include "pwm_pio.h"
 #include "pwm.h"
 #include "config.h"
@@ -155,9 +156,15 @@ void PWM_set_duty_in_channel_with_gamma(pwm_channel_t channel, int duty)
     PWM_set_duty_in_channel(channel, gamma_duty);
 }
 
-void PWM_set_duty_in_channel_with_gamma_max_duty(pwm_channel_t channel, int duty, int max_duty)
+int PWM_set_duty_in_channel_with_gamma_max_duty(pwm_channel_t channel, int duty, int max_duty)
 {
     uint16_t gamma_duty = 0;
+
+    if ( duty > MAX_PWM_DUTY )
+    {
+        gamma_duty = MAX_PWM_DUTY;
+    }
+
 
     if ( duty > max_duty )
     {
@@ -169,8 +176,38 @@ void PWM_set_duty_in_channel_with_gamma_max_duty(pwm_channel_t channel, int duty
     }
     else
     {
-        gamma_duty = (uint16_t)(powf( (float)duty / (float)MAX_PWM_DUTY, GAMMA_FACTOR ) * MAX_PWM_DUTY + 0.5);
+        gamma_duty = (uint16_t)(powf( (float)duty / (float)max_duty, GAMMA_FACTOR ) * max_duty + 0.5);
     }
 
     PWM_set_duty_in_channel(channel, gamma_duty);
+
+    return gamma_duty;
+}
+
+void PWM_set_all(uint16_t pwm_duty)
+{
+    for ( int i = 0 ; i < settings.num_of_stairs ; i ++ )
+    {
+        PWM_set_duty_in_channel_with_gamma((pwm_channel_t)i, pwm_duty);
+    }
+    SEGGER_RTT_printf(0, "Duty: %d\r\n", pwm_duty);
+}
+
+
+void PWM_test(void)
+{
+    static uint16_t duty = 0;
+
+    duty += 25;
+
+    for ( int i = 0 ; i < 23 ; i ++ )
+    {
+        PWM_set_duty_in_channel_with_gamma((pwm_channel_t)i, duty);
+    }
+    SEGGER_RTT_printf(0, "Duty: %d\r\n", duty);
+
+    if ( duty > MAX_PWM_DUTY )
+    {
+        duty = 0;
+    }
 }

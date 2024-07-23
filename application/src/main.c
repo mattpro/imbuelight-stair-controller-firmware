@@ -12,8 +12,9 @@
 #include "io_exp.h"
 #include "utils.h"
 #include "rtt/RTT/SEGGER_RTT.h"
-#include "my_flash.h"
+#include "settings.h"
 #include "my_rtc.h"
+#include "ble_communication.h"
 #include "effects.h"
 
 #include "btstack.h"
@@ -33,6 +34,7 @@ static volatile bool io_exp_pooling_flag = false;
 
 bool main_timer_callback(struct repeating_timer *t) // each 2ms
 {
+    int effect_stat = 0;
     // timer do poolidngu IO expandera
     io_exp_pooling_counter ++;
     if ( io_exp_pooling_counter > 50 )
@@ -41,17 +43,23 @@ bool main_timer_callback(struct repeating_timer *t) // each 2ms
         io_exp_pooling_counter = 0;
     }
 
+    if ( manual_brightness_control_flag )
+    {
+        return;
+    }
+
+
     // Effect main loop (function pointer)
-    stair_effect_event.effect_loop();
+    effect_stat = stair_effect_event.effect_loop();
 
     // Condition to turn on light
-    if ( ( light_on.light_on_flag == true ) && ( ( light_on.light_on_from_top_flag == true ) || ( light_on.light_on_from_bottom_flag == true ) ) )
+    if ( ( effect_stat == EFFECT_OFF ) && ( light_on.light_on_flag == true ) && ( ( light_on.light_on_from_top_flag == true ) || ( light_on.light_on_from_bottom_flag == true ) ) )
     {
         light_on.light_off_counter_ms += MAIN_TIMER_LOOP_MS;
         if ( light_on.light_off_counter_ms > settings.stair_light_on_time_ms ) 
         {
             SEGGER_RTT_WriteString(0,"Light exit\r\n");
-            printf("Light exit\r\n");
+            //printf("Light exit\r\n");
             light_on.dir == DIR_UP_TO_DOWN ? stair_effect_event.effect_end(DIR_UP_TO_DOWN) : stair_effect_event.effect_end(DIR_DOWN_TO_UP);
             light_on.light_on_flag = false;
             light_on.light_off_counter_ms = 0;
@@ -85,6 +93,28 @@ void sens_top_exit(void)
     printf("Sensor top exit\r\n");   
 }
 
+void sens_bottom_enter(void)
+{
+    printf("Sensor bottom enter\r\n");
+    SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
+    light_on.light_off_counter_ms = 0;
+    light_on.light_on_from_bottom_flag = false;
+    if ( ( light_on.light_on_from_bottom_flag == false ) && ( light_on.light_on_flag == false ) )
+    {
+        SEGGER_RTT_WriteString(0,"Light enter\r\n");
+        light_on.light_on_flag = true;
+        light_on.dir = DIR_DOWN_TO_UP;
+        stair_effect_event.effect_start(light_on.dir);
+    }  
+}
+
+void sens_bottom_exit(void)
+{
+    light_on.light_on_from_bottom_flag = true;
+    SEGGER_RTT_WriteString(0,"Sensor bottom exit\r\n"); 
+    printf("Sensor bottom exit\r\n"); 
+}
+
 void action_sensor_top(void)
 {
     printf("Action: TOP\r\n");
@@ -100,33 +130,6 @@ void action_sensor_top(void)
     }  
      light_on.light_on_from_top_flag = true;
 }
-
-
-
-void sens_bottom_enter(void)
-{
-    printf("Sensor bottom enter\r\n");
-    SEGGER_RTT_WriteString(0,"Sensor bottom enter\r\n");
-    light_on.light_off_counter_ms = 0;
-    light_on.light_on_from_bottom_flag = false;
-    if ( ( light_on.light_on_from_bottom_flag == false ) && ( light_on.light_on_flag == false ) )
-    {
-        SEGGER_RTT_WriteString(0,"Light enter\r\n");
-        light_on.light_on_flag = true;
-        light_on.dir = DIR_DOWN_TO_UP;
-
-        stair_effect_event.effect_start(light_on.dir);
-    }  
-}
-
-void sens_bottom_exit(void)
-{
-    light_on.light_on_from_bottom_flag = true;
-    SEGGER_RTT_WriteString(0,"Sensor bottom exit\r\n"); 
-    printf("Sensor bottom exit\r\n"); 
-}
-
-
 
 void action_sensor_bottom(void)
 {
@@ -144,7 +147,6 @@ void action_sensor_bottom(void)
     light_on.light_on_from_bottom_flag = true;
     SEGGER_RTT_WriteString(0,"Sensor bottom exit\r\n"); 
 }
-
 
 
 
@@ -196,7 +198,7 @@ int main()
     IO_EXP_reg_event_sens_top_cbfunc(sens_top_enter, sens_top_exit);
     IO_EXP_reg_event_sens_bottom_cbfunc(sens_bottom_enter, sens_bottom_exit);
 
-    add_repeating_timer_us(MAIN_TIMER_LOOP_MS * (-1000), main_timer_callback, NULL, &main_timer);
+    add_repeating_timer_us(MAIN_TIMER_LOOP_MS * (1000), main_timer_callback, NULL, &main_timer);
 
 
     if (cyw43_arch_init()) 
@@ -231,17 +233,28 @@ int main()
     // second arg is pause on debug which means the watchdog will pause when stepping through code
     watchdog_enable(1000, 0);
 
+
+    // while (1) 
+    // {
+    //     // watchdog_update() must be called at least every 100ms to prevent the watchdog from resetting the chip
+    //     watchdog_update();
+    //     PWM_test();
+    //     sleep_ms(4);
+    // }
+
+
+
     while(1)
     {
         static uint32_t counter = 0;
 
-        
+        watchdog_update();
 
         if ( io_exp_pooling_flag == true) // 100 ms
         { 
             io_exp_pooling_flag = false;
             counter++;
-            SEGGER_RTT_printf(0,"pooling io exp. C: %4d enable:%d light off counter: %d\r\n", counter, effect_1.enable, light_on.light_off_counter_ms);
+            //SEGGER_RTT_printf(0,"pooling io exp. C: %4d enable:%d light off counter: %d\r\n", counter, effect_1.enable, light_on.light_off_counter_ms);
             IO_EXP_pooling();
 
             if ( counter % 10 == 0 )
@@ -252,7 +265,7 @@ int main()
                 cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_on);
             }
 
-            watchdog_update();
+            
         }
     }
 }

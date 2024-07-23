@@ -1,5 +1,5 @@
 PRIMARY_SERVICE, GAP_SERVICE
-CHARACTERISTIC, GAP_DEVICE_NAME, READ, "Imbue Light Stair"
+CHARACTERISTIC, GAP_DEVICE_NAME, READ, "IL Stair"
 
 // Specification Nordic SPP-like profile
 

@@ -40,6 +40,9 @@ void PWM_HW_set_duty(uint8_t channel, uint16_t duty);
 
 void PWM_set_duty_in_channel(pwm_channel_t channel, uint16_t duty);
 void PWM_set_duty_in_channel_with_gamma(pwm_channel_t channel, int duty);
-void PWM_set_duty_in_channel_with_gamma_max_duty(pwm_channel_t channel, int duty, int max_duty);
+int PWM_set_duty_in_channel_with_gamma_max_duty(pwm_channel_t channel, int duty, int max_duty);
+void PWM_set_all(uint16_t pwm_duty);
+
+void PWM_test(void);
 
 #endif

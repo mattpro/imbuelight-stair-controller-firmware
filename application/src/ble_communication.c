@@ -2,17 +2,18 @@
 #include <string.h>
 #include <stdio.h>
 #include "config.h"
-#include "my_flash.h"
+#include "settings.h"
 #include "pwm.h"
 #include "ble_communication.h"
+#include "settings.h"
 #include "rtt/RTT/SEGGER_RTT.h"
-#include "my_flash.h"
 #include "pico/stdlib.h"
 
 
 static ble_cmd_t ble_cmd;
 static ble_param_t ble_param;
 
+uint8_t manual_brightness_control_flag = 0;
 
 extern void action_sensor_top(void);
 extern void action_sensor_bottom(void);
@@ -52,8 +53,10 @@ void BLE_COM_parse(uint8_t* data, uint16_t len)
         case COMMAND_ADDITIONAL:
             SEGGER_RTT_WriteString(0, "BLE COM: CMD=SET_ADDITIONAL\r\n");
 
+        break;
+        case COMMAND_CONTROLL:
+            SEGGER_RTT_WriteString(0, "BLE COM: CMD=SET_CONTROLL\r\n");
 
-            
 
         break;
         default:
@@ -158,6 +161,8 @@ static void BLE_COM_parse_parameter_set(uint8_t* data, uint16_t len)
 
 static void BLE_COM_parse_parameter_action(uint8_t* data, uint16_t len)
 {
+    uint16_t manual_brightness;
+
     ble_param = (ble_cmd_t)(data[0]);
 
     switch(ble_param)
@@ -180,6 +185,22 @@ static void BLE_COM_parse_parameter_action(uint8_t* data, uint16_t len)
             printf("BLE COM: PARAM=ACT_PRESS_BOTTOM_PRESS\r\n");
             action_sensor_bottom();
         break; 
+        case PARAM_ACT_MANUAL_BRIGHTNESS_CONTROL_ENABLE_DISABLE:
+            manual_brightness_control_flag = data[1];
+            SEGGER_RTT_printf(0, "BLE COM: PARAM=ACT_MANUAL_BRIGHTNESS_CONTROL_ENABLE_DISABLE: %d\r\n", manual_brightness_control_flag);
+            if ( manual_brightness_control_flag == 0 )
+            {
+                PWM_set_all( 0 );
+            }
+        break;
+        case PARAM_ACT_SET_MANUAL_BRIGHTNESS:
+            manual_brightness = ( (uint16_t)data[2] << 8 ) | data[1];
+            SEGGER_RTT_printf(0, "Set manual brightness: %d\r\n", manual_brightness);
+            if ( manual_brightness_control_flag == 1)
+            {
+                PWM_set_all( manual_brightness );
+            }
+        break;
         default:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=ACT Unknow\r\n");
             printf("BLE COM: PARAM=ACT Unknow\r\n");

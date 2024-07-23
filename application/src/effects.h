@@ -4,6 +4,15 @@
 #include <stdint.h>
 #include "pico/stdlib.h"
 
+#define EFFECT_NUM_1 1
+#define EFFECT_NUM_2 2
+
+
+#define EFFECT_DISABLE_AFTER_ON     1
+#define EFFECT_DISABLE_AFTER_OFF    2
+#define EFFECT_ON                   3
+#define EFFECT_OFF                  4
+
 
 typedef enum {
     DIR_DOWN_TO_UP,
@@ -39,7 +48,7 @@ typedef struct {
 typedef struct {
     void (*effect_start)(effect_dir_t dir); 
     void (*effect_end) (effect_dir_t dir); 
-    void (*effect_loop) (void); 
+    int (*effect_loop) (void); 
 } stair_effect_event_t;
 
 

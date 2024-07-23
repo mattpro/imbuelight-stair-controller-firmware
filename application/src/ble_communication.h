@@ -3,10 +3,12 @@
 
 #include <stdint.h>
 
+extern uint8_t manual_brightness_control_flag;
 
 typedef enum { 
     COMMAND_SET_PARAMETER           = 0xDE, 
     COMMAND_ACTION                  = 0xAA, 
+    COMMAND_CONTROLL                = 0xBB,
     COMMAND_ADDITIONAL              = 0xAF,
 } ble_cmd_t;
 
@@ -23,6 +25,9 @@ typedef enum {
     PARAM_ACT_PRESS_SW_2            = 0xB1,
     PARAM_ACT_PRESS_TOP_PRESS       = 0x01,
     PARAM_ACT_PRESS_BOTTOM_PRESS    = 0x02,
+    PARAM_ACT_MANUAL_BRIGHTNESS_CONTROL_ENABLE_DISABLE = 0xF8,
+    PARAM_ACT_SET_MANUAL_BRIGHTNESS = 0xF9,
+
 
     PARAM_ADD_SWITCH_CHANNEL        = 0x01,
 } ble_param_t;

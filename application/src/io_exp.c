@@ -33,35 +33,27 @@ typedef struct io_expander_evet
     void (*_button4_unpress)  (void);   
 }io_expander_event_t;
 
-extern void sens_top_enter(void);
-extern void sens_top_exit(void);
+
 
 // default function 
-void default_sens_top_enter(void)       {printf("Top enter\r\n");}
-void default_sens_top_exit(void)        {printf("Top exit\r\n");}
-void default_sens_bottom_enter(void)    {printf("Bottom enter\r\n");}
-void default_sens_bottom_exit(void)     {printf("Bottom exit\r\n");}
+void default_sens_top_enter(void)       {SEGGER_RTT_WriteString(0, "Top enter\r\n");}
+void default_sens_top_exit(void)        {SEGGER_RTT_WriteString(0, "Top exit\r\n");}
+void default_sens_bottom_enter(void)    {SEGGER_RTT_WriteString(0, "Bottom enter\r\n");}
+void default_sens_bottom_exit(void)     {SEGGER_RTT_WriteString(0, "Bottom exit\r\n");}
 
-void default_sens_switch1_press(void)   {printf("Switch 1 press\r\n");}
-void default_sens_switch1_unpress(void) {printf("Switch 1 unpress\r\n");}
-void default_sens_switch2_press(void)   {printf("Switch 2 press\r\n");}
-void default_sens_switch2_unpress(void) {printf("Switch 2 unpress\r\n");}
+void default_sens_switch1_press(void)   {SEGGER_RTT_WriteString(0, "Switch 1 press\r\n");}
+void default_sens_switch1_unpress(void) {SEGGER_RTT_WriteString(0, "Switch 1 unpress\r\n");}
+void default_sens_switch2_press(void)   {SEGGER_RTT_WriteString(0, "Switch 2 press\r\n");}
+void default_sens_switch2_unpress(void) {SEGGER_RTT_WriteString(0, "Switch 2 unpress\r\n");}
 
-//void default_sens_button1_press(void)   {printf("Button 1 press\r\n");}
-//void default_sens_button1_unpress(void) {printf("Button 1 unpress\r\n");}
-void default_sens_button1_press(void)   {sens_top_enter();}
-void default_sens_button1_unpress(void) {sens_top_exit();}
-
-//void default_sens_button2_press(void)   {printf("Button 2 press\r\n");}
-//void default_sens_button2_unpress(void) {printf("Button 2 unpress\r\n");}
-void default_sens_button2_press(void)   {printf("Button 2 press\r\n");}
-void default_sens_button2_unpress(void) {printf("Button 2 unpress\r\n");}
-
-
-void default_sens_button3_press(void)   {printf("Button 3 press\r\n");}
-void default_sens_button3_unpress(void) {printf("Button 3 unpress\r\n");}
-void default_sens_button4_press(void)   {printf("Button 4 press\r\n");}
-void default_sens_button4_unpress(void) {printf("Button 4 unpress\r\n");}
+void default_sens_button1_press(void)   {SEGGER_RTT_WriteString(0, "Button 1 press\r\n");}
+void default_sens_button1_unpress(void) {SEGGER_RTT_WriteString(0, "Button 1 unpress\r\n");}
+void default_sens_button2_press(void)   {SEGGER_RTT_WriteString(0, "Button 2 press\r\n");}
+void default_sens_button2_unpress(void) {SEGGER_RTT_WriteString(0, "Button 2 unpress\r\n");}
+void default_sens_button3_press(void)   {SEGGER_RTT_WriteString(0, "Button 3 press\r\n");}
+void default_sens_button3_unpress(void) {SEGGER_RTT_WriteString(0, "Button 3 unpress\r\n");}
+void default_sens_button4_press(void)   {SEGGER_RTT_WriteString(0, "Button 4 press\r\n");}
+void default_sens_button4_unpress(void) {SEGGER_RTT_WriteString(0, "Button 4 unpress\r\n");}
 
 // define and set default function
 io_expander_event_t io_expander_event =
@@ -148,7 +140,7 @@ void IO_EXP_pooling(void)
 {   
     I2C_read(IO_EXP_I2C_ADDRESS, 0x00, &new_io_exp_state, 1); 
     change_io_exp_state = new_io_exp_state ^ old_io_exp_state;
-   //SEGGER_RTT_printf(0, "Change: %02X current state: %02X\r\n", change_io_exp_state, (uint8_t)(~new_io_exp_state));
+    //SEGGER_RTT_printf(0, "Change: %02X current state: %02X\r\n", change_io_exp_state, (uint8_t)(~new_io_exp_state));
 
     switch( change_io_exp_state )
     {

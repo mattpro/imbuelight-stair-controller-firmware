@@ -10,7 +10,7 @@
 #include "temp_sensor.h"
 #include "ble_communication.h"
 #include "effects.h"
-#include "my_flash.h"
+#include "settings.h"
 
 #include "rtt/RTT/SEGGER_RTT.h"
 
@@ -19,7 +19,7 @@ static uint8_t adv_data[] = {
     // Flags general discoverable
     0x02, BLUETOOTH_DATA_TYPE_FLAGS, APP_AD_FLAGS,
     // Name
-    0x19, BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME, 'I', 'm', 'b', 'u', 'e', ' ', 'L', 'i', 'g', 'h', 't', ' ', 'S', 't', 'a', 'i', 'r', ' ', 'a', 'b', 'c', 'd', 'e','f'
+    0x19, BLUETOOTH_DATA_TYPE_COMPLETE_LOCAL_NAME, 'I', 'L', ' ', 'S', 't', 'a', 'i', 'r', ' ', 'a', 'b', 'c', 'd', 'e', 'f', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' '
 };
 static const uint8_t adv_data_len = sizeof(adv_data);
 
@@ -50,7 +50,7 @@ void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint
             addr_s[0] = local_addr[0] ^ local_addr[1];
             addr_s[1] = local_addr[2] ^ local_addr[3];
             addr_s[2] = local_addr[4] ^ local_addr[5];
-            sprintf(&adv_data[5], "Imbue Light Stair %02X%02X%02X", addr_s[0], addr_s[1], addr_s[2]);
+            sprintf(&adv_data[5], "IL Stair %02X%02X%02X", addr_s[0], addr_s[1], addr_s[2]);
 
             // setup advertisements
             uint16_t adv_int_min = 800;
@@ -80,7 +80,7 @@ uint16_t att_read_callback(hci_con_handle_t connection_handle, uint16_t att_hand
 
     SEGGER_RTT_printf(0, "BLE read. Len=%d data=%s", buffer_size, buffer);
 
-    uint8_t data_to_send[18];
+    uint8_t data_to_send[19];
     uint32_t data_pointer = 0;
     
     memcpy((void*)&data_to_send[0], (void*)&settings.reset_count, sizeof(uint32_t) );

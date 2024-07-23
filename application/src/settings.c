@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "config.h"
 #include "hardware/flash.h"
-#include "my_flash.h"
+#include "settings.h"
 #include "pwm.h"
 #include "effects.h"
 #include "rtt/RTT/SEGGER_RTT.h"
@@ -39,6 +39,9 @@ void SETTINGS_load(void)
     memcpy((void*)&settings.max_pwm_duty, (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
 
+    memcpy((void*)&settings.min_pwm_duty, (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+
     memcpy((void*)&settings.stair_light_on_time_ms, (void*)&flash_target_contents[data_pointer], sizeof(uint32_t) );
     data_pointer += sizeof(uint32_t);
 
@@ -54,6 +57,21 @@ void SETTINGS_load(void)
     memcpy((void*)&settings.effect2_settings_1, (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
 
+
+    if ( settings.selected_effect_number == EFFECT_NUM_1 )
+    {
+        EFFECT_set_effect_1();
+    }
+    else if ( settings.selected_effect_number == EFFECT_NUM_2 )
+    {
+        EFFECT_set_effect_2();
+    }
+    else
+    {
+        settings.selected_effect_number = SETTINGS_DEFAULT_SELECTED_EFFECT_NUMBER;
+        EFFECT_set_effect_1();
+    }
+
     effect_1.increment_step = settings.effect1_settings_1;
     effect_1.wide = settings.effect1_settings_2;
     effect_2.increment_step = settings.effect2_settings_1;
@@ -64,6 +82,7 @@ void SETTINGS_load(void)
     SEGGER_RTT_printf(0, "reset_count: %d\r\n", settings.reset_count);
     SEGGER_RTT_printf(0, "num_of_stairs: %d\r\n", settings.num_of_stairs);
     SEGGER_RTT_printf(0, "max_pwm_duty: %d\r\n", settings.max_pwm_duty);
+    SEGGER_RTT_printf(0, "min_pwm_duty: %d\r\n", settings.min_pwm_duty);
     SEGGER_RTT_printf(0, "stair_light_on_time_ms: %d\r\n", settings.stair_light_on_time_ms);
     SEGGER_RTT_printf(0, "selected_effect_number: %d\r\n", settings.selected_effect_number);
     SEGGER_RTT_printf(0, "effect1_settings_1: %d\r\n", settings.effect1_settings_1);
@@ -84,6 +103,9 @@ void SETTINGS_save(void)
     data_pointer += sizeof(uint8_t);
     
     memcpy((void*)&data_to_save[data_pointer], (void*)&settings.max_pwm_duty, sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.min_pwm_duty, sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
     
     memcpy((void*)&data_to_save[data_pointer], (void*)&settings.stair_light_on_time_ms, sizeof(uint32_t) );
@@ -115,16 +137,32 @@ void SETTINGS_load_and_save_default(void)
 {
     settings.num_of_stairs = SETTINGS_DEFAULT_NUM_OF_STAIRS;
     settings.max_pwm_duty = SETTINGS_DEFAULT_MAX_PWM;
+    settings.min_pwm_duty = SETTINGS_DEFAULT_MIN_PWM;
     settings.stair_light_on_time_ms = SETTINGS_DEFAULT_STAIR_LIGHT_ON_TIME_MS;
+
     settings.selected_effect_number = SETTINGS_DEFAULT_SELECTED_EFFECT_NUMBER;
 
     settings.effect1_settings_1 = SETTINGS_DEFAULT_EFFECT_1_SETTINGS_1;
     settings.effect1_settings_2 = SETTINGS_DEFAULT_EFFECT_1_SETTINGS_2;
     settings.effect2_settings_1 = SETTINGS_DEFAULT_EFFECT_2_SETTINGS_1;
 
+
+    if ( settings.selected_effect_number == EFFECT_NUM_1 )
+    {
+        EFFECT_set_effect_1();
+    }
+    else if ( settings.selected_effect_number == EFFECT_NUM_2 )
+    {
+        EFFECT_set_effect_2();
+    }
+    else
+    {
+        settings.selected_effect_number = SETTINGS_DEFAULT_SELECTED_EFFECT_NUMBER;
+        EFFECT_set_effect_1();
+    }
+
     effect_1.increment_step = settings.effect1_settings_1;
     effect_1.wide = settings.effect1_settings_2;
-
     effect_2.increment_step = settings.effect2_settings_1;
 
     SETTINGS_save();
@@ -146,6 +184,7 @@ void SETTINGS_print_rtt(void)
     SEGGER_RTT_printf(0, "reset_count: %d\r\n", settings.reset_count);
     SEGGER_RTT_printf(0, "num_of_stairs: %d\r\n", settings.num_of_stairs);
     SEGGER_RTT_printf(0, "max_pwm_duty: %d\r\n", settings.max_pwm_duty);
+    SEGGER_RTT_printf(0, "min_pwm_duty: %d\r\n", settings.min_pwm_duty);
     SEGGER_RTT_printf(0, "stair_light_on_time_ms: %d\r\n", settings.stair_light_on_time_ms);
     SEGGER_RTT_printf(0, "selected_effect_number: %d\r\n", settings.selected_effect_number);
     SEGGER_RTT_printf(0, "effect1_settings_1: %d\r\n", settings.effect1_settings_1);
@@ -161,6 +200,7 @@ void SETTINGS_print_serial(void)
     printf("reset_count: %d\r\n", settings.reset_count);
     printf("num_of_stairs: %d\r\n", settings.num_of_stairs);
     printf("max_pwm_duty: %d\r\n", settings.max_pwm_duty);
+    printf("min_pwm_duty: %d\r\n", settings.min_pwm_duty);
     printf("stair_light_on_time_ms: %d\r\n", settings.stair_light_on_time_ms);
     printf("selected_effect_number: %d\r\n", settings.selected_effect_number);
     printf("effect1_settings_1: %d\r\n", settings.effect1_settings_1);

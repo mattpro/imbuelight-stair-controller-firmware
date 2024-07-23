@@ -7,8 +7,22 @@
 
 
 // SETTINGS
-#define GAMMA_FACTOR 4.0f
+#define GAMMA_FACTOR 2.2f
 #define MAIN_TIMER_LOOP_MS 2
+
+// DEFAULT SETTINGS
+#define SETTINGS_DEFAULT_NUM_OF_STAIRS              18
+#define SETTINGS_DEFAULT_MAX_PWM                    1000 //MAX_PWM_DUTY   //max pwm = 16383 
+#define SETTINGS_DEFAULT_MIN_PWM                    500
+#define SETTINGS_DEFAULT_STAIR_LIGHT_ON_TIME_MS     5000
+#define SETTINGS_DEFAULT_SELECTED_EFFECT_NUMBER     EFFECT_NUM_1
+#define SETTINGS_DEFAULT_EFFECT_1_SETTINGS_1        1        // Effect 1 and 2 increment_step
+#define SETTINGS_DEFAULT_EFFECT_1_SETTINGS_2        50//1000        // Effect 2 wide 
+#define SETTINGS_DEFAULT_EFFECT_2_SETTINGS_1        10
+
+
+
+
 
 
 
