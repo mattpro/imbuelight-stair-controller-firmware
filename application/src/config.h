@@ -3,8 +3,8 @@
 
 #include "rtt/RTT/SEGGER_RTT.h"
 
-#define FW_VERSION "0.1"
-
+#define FW_VERSION_STR "0.1"
+#define FW_VERSION      1 
 
 // SETTINGS
 #define GAMMA_FACTOR 2.2f
@@ -19,6 +19,7 @@
 #define SETTINGS_DEFAULT_EFFECT_1_SETTINGS_1        1        // Effect 1 and 2 increment_step
 #define SETTINGS_DEFAULT_EFFECT_1_SETTINGS_2        50//1000        // Effect 2 wide 
 #define SETTINGS_DEFAULT_EFFECT_2_SETTINGS_1        10
+#define SETTINGS_DEFAULT_EFFECT_3_SETTINGS_1        10      // Effect 3 random width
 
 
 

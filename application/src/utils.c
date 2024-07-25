@@ -7,7 +7,7 @@
 void delay_boot_info(void)
 {
     printf("############################################\r\n");
-    printf("### IMBUE LIGHT STAIR CONTROLLER VER %s ###\r\n", FW_VERSION);
+    printf("### IMBUE LIGHT STAIR CONTROLLER VER %s ###\r\n", FW_VERSION_STR);
     printf( "###         %s %s         ###\r\n", __DATE__, __TIME__);
     printf("############################################\r\n");
 }
@@ -16,7 +16,7 @@ void delay_boot_info(void)
 void boot_info_rtt(void)
 {
     SEGGER_RTT_WriteString(0,"############################################\r\n");
-    SEGGER_RTT_printf(0,"### IMBUE LIGHT STAIR CONTROLLER VER %s ###\r\n", FW_VERSION);
+    SEGGER_RTT_printf(0,"### IMBUE LIGHT STAIR CONTROLLER VER %s ###\r\n", FW_VERSION_STR);
     SEGGER_RTT_printf(0, "###         %s %s         ###\r\n", __DATE__, __TIME__);
     SEGGER_RTT_WriteString(0,"############################################\r\n");
 }

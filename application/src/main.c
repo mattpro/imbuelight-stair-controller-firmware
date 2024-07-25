@@ -45,9 +45,8 @@ bool main_timer_callback(struct repeating_timer *t) // each 2ms
 
     if ( manual_brightness_control_flag )
     {
-        return;
+        return true;
     }
-
 
     // Effect main loop (function pointer)
     effect_stat = stair_effect_event.effect_loop();
@@ -159,14 +158,6 @@ static void heartbeat_handler(struct btstack_timer_source *ts)
     static uint32_t counter = 0;
     counter++;
 
-    // // Update the temp every 10s
-    // if (counter % 10 == 0) {
-    //     poll_temp();
-    //     if (le_notification_enabled) {
-    //         att_server_request_can_send_now_event(con_handle);
-    //     }
-    // }
-
     // Invert the led
     static int led_on = true;
     led_on = !led_on;
@@ -185,7 +176,7 @@ int main()
     start_blink_led();
     boot_info_rtt();
 
-    SETTINGS_load_and_save_default();
+    //SETTINGS_load_and_save_default();
     SETTINGS_load_and_increase_reset_count();
 
     PWM_HW_init();
@@ -223,27 +214,23 @@ int main()
 
     // turn on bluetooth!
     hci_power_control(HCI_POWER_ON);
-    
-    //btstack_run_loop_execute();
 
     delay_boot_info();
-
 
     // Enable the watchdog, requiring the watchdog to be updated every 100ms or the chip will reboot
     // second arg is pause on debug which means the watchdog will pause when stepping through code
     watchdog_enable(1000, 0);
 
-
-    // while (1) 
+    // while (1)
     // {
-    //     // watchdog_update() must be called at least every 100ms to prevent the watchdog from resetting the chip
+    //     if (le_notification_enabled) {
+    //         att_server_request_can_send_now_event(con_handle);
+    //     }
     //     watchdog_update();
-    //     PWM_test();
-    //     sleep_ms(4);
+
+    //     sleep_ms(200);
     // }
-
-
-
+    
     while(1)
     {
         static uint32_t counter = 0;
@@ -264,8 +251,28 @@ int main()
                 led_on = !led_on;
                 cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_on);
             }
+        }
 
-            
+        if ( save_flag == 1 )
+        {
+            save_flag = 0;
+            SETTINGS_save();
+
+            PWM_set_all(settings.max_pwm_duty);
+            sleep_ms(100);
+            PWM_set_all(0);
+            sleep_ms(100);
+            PWM_set_all(settings.max_pwm_duty);
+            sleep_ms(100);
+            PWM_set_all(0);
+        }
+
+        if ( connected_flag == 1)
+        {
+            connected_flag = 0;
+            PWM_set_all(settings.max_pwm_duty);
+            sleep_ms(200);
+            PWM_set_all(0);
         }
     }
 }

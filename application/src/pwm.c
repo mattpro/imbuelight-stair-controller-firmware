@@ -188,7 +188,7 @@ void PWM_set_all(uint16_t pwm_duty)
 {
     for ( int i = 0 ; i < settings.num_of_stairs ; i ++ )
     {
-        PWM_set_duty_in_channel_with_gamma((pwm_channel_t)i, pwm_duty);
+        PWM_set_duty_in_channel_with_gamma_max_duty((pwm_channel_t)i, pwm_duty, settings.max_pwm_duty);
     }
     SEGGER_RTT_printf(0, "Duty: %d\r\n", pwm_duty);
 }

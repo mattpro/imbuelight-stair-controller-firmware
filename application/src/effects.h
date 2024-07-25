@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include "pico/stdlib.h"
 
-#define EFFECT_NUM_1 1
-#define EFFECT_NUM_2 2
-
+#define EFFECT_NUM_1    0
+#define EFFECT_NUM_2    1
+#define EFFECT_NUM_3    2
 
 #define EFFECT_DISABLE_AFTER_ON     1
 #define EFFECT_DISABLE_AFTER_OFF    2
@@ -42,6 +42,8 @@ typedef struct {
     // settings
     uint16_t increment_step;    // speed of effect
     uint16_t wide;              // wide of effect
+    uint16_t random_width;  
+    uint16_t delay;      
 } stair_effect_t;
 
 
@@ -54,12 +56,15 @@ typedef struct {
 
 extern volatile stair_effect_t effect_1;
 extern volatile stair_effect_t effect_2;
+extern volatile stair_effect_t effect_3;
 extern volatile light_on_t light_on;
 extern stair_effect_event_t stair_effect_event;
 
 
 void EFFECT_set_effect_1(void);
 void EFFECT_set_effect_2(void);
-
+void EFFECT_set_effect_3(void);
+void EFFECT_stop_effect(void);
+void EFFECT_set_effect_settings(void);
 
 #endif

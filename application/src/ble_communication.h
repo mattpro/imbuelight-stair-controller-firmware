@@ -15,19 +15,22 @@ typedef enum {
 typedef enum { 
     PARAM_SET_NUM_STAIR             = 0x01,  
     PARAM_SET_MAX_PWM               = 0x02, 
+    PARAM_SET_MIN_PWM               = 0x12, 
     PARAM_SET_LIGHT_TIME            = 0x03, 
     PARAM_SET_EFFECT                = 0x04, 
     PARAM_SET_ALL_PARAM             = 0xFF, 
     PARAM_SET_LOAD_AND_SAVE_DEFAULT = 0xDF,
     PARAM_SET_SAVE_ALL              = 0xEE,
+    PARAM_SET_READ_ALL              = 0xED,
 
     PARAM_ACT_PRESS_SW_1            = 0xA1,
     PARAM_ACT_PRESS_SW_2            = 0xB1,
     PARAM_ACT_PRESS_TOP_PRESS       = 0x01,
     PARAM_ACT_PRESS_BOTTOM_PRESS    = 0x02,
-    PARAM_ACT_MANUAL_BRIGHTNESS_CONTROL_ENABLE_DISABLE = 0xF8,
-    PARAM_ACT_SET_MANUAL_BRIGHTNESS = 0xF9,
+    PARAM_ACT_SOFT_RESET            = 0x33,
 
+    PARAM_CTRL_MANUAL_BRIGHTNESS_CONTROL_ENABLE_DISABLE = 0xF8,
+    PARAM_CTRL_SET_MANUAL_BRIGHTNESS = 0xF9,
 
     PARAM_ADD_SWITCH_CHANNEL        = 0x01,
 } ble_param_t;

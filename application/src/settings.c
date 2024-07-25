@@ -3,18 +3,33 @@
 #include <stdio.h>
 #include "config.h"
 #include "hardware/flash.h"
+#include "hardware/watchdog.h"
+#include "hardware/sync.h"
 #include "settings.h"
 #include "pwm.h"
 #include "effects.h"
 #include "rtt/RTT/SEGGER_RTT.h"
 #include "pico/stdlib.h"
 
-#define FLASH_TARGET_OFFSET (512 * 1024)
+#define FLASH_TARGET_OFFSET (1024 * 1024)
 
 const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);
 
 volatile settings_t settings;
 
+uint8_t save_flag = 0;
+
+void EFFECT_set_effect_settings(void)
+{
+    effect_1.increment_step = settings.effect_settings_1[0];
+    effect_1.wide           = settings.effect_settings_2[0];
+
+    effect_2.increment_step = settings.effect_settings_1[1];
+
+    effect_3.increment_step = settings.effect_settings_1[2];
+    effect_3.random_width   = settings.effect_settings_2[2];
+    effect_3.delay          = settings.effect_settings_3[2];
+}
 
 void SETTINGS_load(void)
 {
@@ -48,15 +63,26 @@ void SETTINGS_load(void)
     memcpy((void*)&settings.selected_effect_number, (void*)&flash_target_contents[data_pointer], sizeof(uint8_t) );
     data_pointer += sizeof(uint8_t);
 
-    memcpy((void*)&settings.effect1_settings_1, (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    memcpy((void*)&settings.effect_settings_1[0], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&settings.effect_settings_2[0], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&settings.effect_settings_3[0], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
 
-    memcpy((void*)&settings.effect1_settings_2, (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    memcpy((void*)&settings.effect_settings_1[1], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&settings.effect_settings_2[1], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&settings.effect_settings_3[1], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
 
-    memcpy((void*)&settings.effect2_settings_1, (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    memcpy((void*)&settings.effect_settings_1[2], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
-
+    memcpy((void*)&settings.effect_settings_2[2], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&settings.effect_settings_3[2], (void*)&flash_target_contents[data_pointer], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
 
     if ( settings.selected_effect_number == EFFECT_NUM_1 )
     {
@@ -66,16 +92,17 @@ void SETTINGS_load(void)
     {
         EFFECT_set_effect_2();
     }
+    else if ( settings.selected_effect_number == EFFECT_NUM_3 )
+    {
+        EFFECT_set_effect_3();
+    }
     else
     {
         settings.selected_effect_number = SETTINGS_DEFAULT_SELECTED_EFFECT_NUMBER;
         EFFECT_set_effect_1();
     }
 
-    effect_1.increment_step = settings.effect1_settings_1;
-    effect_1.wide = settings.effect1_settings_2;
-    effect_2.increment_step = settings.effect2_settings_1;
-
+    EFFECT_set_effect_settings();
 
     SEGGER_RTT_printf(0, "Flash target contets: %X\r\n", flash_target_contents);
     SEGGER_RTT_printf(0, "LOAD SETTINGS FROM FLASH:\r\n");
@@ -85,9 +112,15 @@ void SETTINGS_load(void)
     SEGGER_RTT_printf(0, "min_pwm_duty: %d\r\n", settings.min_pwm_duty);
     SEGGER_RTT_printf(0, "stair_light_on_time_ms: %d\r\n", settings.stair_light_on_time_ms);
     SEGGER_RTT_printf(0, "selected_effect_number: %d\r\n", settings.selected_effect_number);
-    SEGGER_RTT_printf(0, "effect1_settings_1: %d\r\n", settings.effect1_settings_1);
-    SEGGER_RTT_printf(0, "effect1_settings_2: %d\r\n", settings.effect1_settings_2);
-    SEGGER_RTT_printf(0, "effect2_settings_1: %d\r\n", settings.effect2_settings_1);
+    SEGGER_RTT_printf(0, "effect1_settings_1: %d\r\n", settings.effect_settings_1[0]);
+    SEGGER_RTT_printf(0, "effect1_settings_2: %d\r\n", settings.effect_settings_2[0]);
+    SEGGER_RTT_printf(0, "effect1_settings_3: %d\r\n", settings.effect_settings_3[0]);
+    SEGGER_RTT_printf(0, "effect2_settings_1: %d\r\n", settings.effect_settings_1[1]);
+    SEGGER_RTT_printf(0, "effect2_settings_2: %d\r\n", settings.effect_settings_2[1]);
+    SEGGER_RTT_printf(0, "effect2_settings_3: %d\r\n", settings.effect_settings_3[1]);
+    SEGGER_RTT_printf(0, "effect3_settings_1: %d\r\n", settings.effect_settings_1[2]);
+    SEGGER_RTT_printf(0, "effect3_settings_2: %d\r\n", settings.effect_settings_2[2]);
+    SEGGER_RTT_printf(0, "effect3_settings_3: %d\r\n", settings.effect_settings_3[2]);
 }
 
 
@@ -114,14 +147,29 @@ void SETTINGS_save(void)
     memcpy((void*)&data_to_save[data_pointer], (void*)&settings.selected_effect_number, sizeof(uint8_t) );
     data_pointer += sizeof(uint8_t);
 
-    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect1_settings_1, sizeof(uint16_t) );
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_1[0], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_2[0], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_3[0], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
 
-    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect1_settings_2, sizeof(uint16_t) );
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_1[1], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_2[1], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_3[1], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
 
-    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect2_settings_1, sizeof(uint16_t) );
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_1[2], sizeof(uint16_t) );
     data_pointer += sizeof(uint16_t);
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_2[2], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    memcpy((void*)&data_to_save[data_pointer], (void*)&settings.effect_settings_3[2], sizeof(uint16_t) );
+    data_pointer += sizeof(uint16_t);
+    //watchdog_enable(10000, 0);
+
+    uint32_t save = save_and_disable_interrupts();
 
     SEGGER_RTT_WriteString(0,"Erasing target region...\r\n");
     flash_range_erase(FLASH_TARGET_OFFSET, FLASH_SECTOR_SIZE);
@@ -129,12 +177,24 @@ void SETTINGS_save(void)
     SEGGER_RTT_WriteString(0,"Programming target region...\r\n");
     flash_range_program(FLASH_TARGET_OFFSET, data_to_save, FLASH_PAGE_SIZE);
 
+    restore_interrupts(save);
+
     SEGGER_RTT_printf(0, "SAVE TO FLASH\r\n");
+
+    //watchdog_enable(1000, 0);
 }
 
 
 void SETTINGS_load_and_save_default(void)
 {
+    SETTINGS_load_default();
+    SETTINGS_save();
+}
+
+void SETTINGS_load_default(void)
+{
+    SEGGER_RTT_WriteString(0,"LOAD DEFAULT SETTINGS\r\n");
+
     settings.num_of_stairs = SETTINGS_DEFAULT_NUM_OF_STAIRS;
     settings.max_pwm_duty = SETTINGS_DEFAULT_MAX_PWM;
     settings.min_pwm_duty = SETTINGS_DEFAULT_MIN_PWM;
@@ -142,9 +202,12 @@ void SETTINGS_load_and_save_default(void)
 
     settings.selected_effect_number = SETTINGS_DEFAULT_SELECTED_EFFECT_NUMBER;
 
-    settings.effect1_settings_1 = SETTINGS_DEFAULT_EFFECT_1_SETTINGS_1;
-    settings.effect1_settings_2 = SETTINGS_DEFAULT_EFFECT_1_SETTINGS_2;
-    settings.effect2_settings_1 = SETTINGS_DEFAULT_EFFECT_2_SETTINGS_1;
+    settings.effect_settings_1[0] = SETTINGS_DEFAULT_EFFECT_1_SETTINGS_1;
+    settings.effect_settings_2[0] = SETTINGS_DEFAULT_EFFECT_1_SETTINGS_2;
+
+    settings.effect_settings_1[1] = SETTINGS_DEFAULT_EFFECT_2_SETTINGS_1;
+
+    settings.effect_settings_1[2] = SETTINGS_DEFAULT_EFFECT_3_SETTINGS_1;
 
 
     if ( settings.selected_effect_number == EFFECT_NUM_1 )
@@ -155,23 +218,27 @@ void SETTINGS_load_and_save_default(void)
     {
         EFFECT_set_effect_2();
     }
+    else if ( settings.selected_effect_number == EFFECT_NUM_3 )
+    {
+        EFFECT_set_effect_3();
+    }
     else
     {
         settings.selected_effect_number = SETTINGS_DEFAULT_SELECTED_EFFECT_NUMBER;
         EFFECT_set_effect_1();
     }
 
-    effect_1.increment_step = settings.effect1_settings_1;
-    effect_1.wide = settings.effect1_settings_2;
-    effect_2.increment_step = settings.effect2_settings_1;
-
-    SETTINGS_save();
+    EFFECT_set_effect_settings();
 }
 
 
 void SETTINGS_load_and_increase_reset_count(void)
 {
     SETTINGS_load();
+    if ( ( settings.reset_count == 0 ) && ( settings.reset_count == 0xFFFFFFFF ) )
+    {
+        SETTINGS_load_default();
+    }
     settings.reset_count++;
     SETTINGS_save();
 }
@@ -187,9 +254,15 @@ void SETTINGS_print_rtt(void)
     SEGGER_RTT_printf(0, "min_pwm_duty: %d\r\n", settings.min_pwm_duty);
     SEGGER_RTT_printf(0, "stair_light_on_time_ms: %d\r\n", settings.stair_light_on_time_ms);
     SEGGER_RTT_printf(0, "selected_effect_number: %d\r\n", settings.selected_effect_number);
-    SEGGER_RTT_printf(0, "effect1_settings_1: %d\r\n", settings.effect1_settings_1);
-    SEGGER_RTT_printf(0, "effect1_settings_2: %d\r\n", settings.effect1_settings_2);
-    SEGGER_RTT_printf(0, "effect2_settings_1: %d\r\n", settings.effect2_settings_1);
+    SEGGER_RTT_printf(0, "effect1_settings_1: %d\r\n", settings.effect_settings_1[0]);
+    SEGGER_RTT_printf(0, "effect1_settings_2: %d\r\n", settings.effect_settings_2[0]);
+    SEGGER_RTT_printf(0, "effect1_settings_3: %d\r\n", settings.effect_settings_3[0]);
+    SEGGER_RTT_printf(0, "effect2_settings_1: %d\r\n", settings.effect_settings_1[1]);
+    SEGGER_RTT_printf(0, "effect2_settings_2: %d\r\n", settings.effect_settings_2[1]);
+    SEGGER_RTT_printf(0, "effect2_settings_3: %d\r\n", settings.effect_settings_3[1]);
+    SEGGER_RTT_printf(0, "effect3_settings_1: %d\r\n", settings.effect_settings_1[2]);
+    SEGGER_RTT_printf(0, "effect3_settings_2: %d\r\n", settings.effect_settings_2[2]);
+    SEGGER_RTT_printf(0, "effect3_settings_3: %d\r\n", settings.effect_settings_3[2]);
 }
 
 
@@ -203,7 +276,13 @@ void SETTINGS_print_serial(void)
     printf("min_pwm_duty: %d\r\n", settings.min_pwm_duty);
     printf("stair_light_on_time_ms: %d\r\n", settings.stair_light_on_time_ms);
     printf("selected_effect_number: %d\r\n", settings.selected_effect_number);
-    printf("effect1_settings_1: %d\r\n", settings.effect1_settings_1);
-    printf("effect1_settings_2: %d\r\n", settings.effect1_settings_2);
-    printf("effect2_settings_1: %d\r\n", settings.effect2_settings_1);
+    printf("effect1_settings_1: %d\r\n", settings.effect_settings_1[0]);
+    printf("effect1_settings_2: %d\r\n", settings.effect_settings_2[0]);
+    printf("effect1_settings_3: %d\r\n", settings.effect_settings_3[0]);
+    printf("effect2_settings_1: %d\r\n", settings.effect_settings_1[1]);
+    printf("effect2_settings_2: %d\r\n", settings.effect_settings_2[1]);
+    printf("effect2_settings_3: %d\r\n", settings.effect_settings_3[1]);
+    printf("effect3_settings_1: %d\r\n", settings.effect_settings_1[2]);
+    printf("effect3_settings_2: %d\r\n", settings.effect_settings_2[2]);
+    printf("effect3_settings_3: %d\r\n", settings.effect_settings_3[2]);
 }
