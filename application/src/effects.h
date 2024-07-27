@@ -4,9 +4,14 @@
 #include <stdint.h>
 #include "pico/stdlib.h"
 
-#define EFFECT_NUM_1    0
-#define EFFECT_NUM_2    1
-#define EFFECT_NUM_3    2
+
+#define EFFECT_NUM_1            0
+#define EFFECT_NUM_2            1
+#define EFFECT_NUM_3            2
+
+#define TOTAL_EFFECT_NUMBER     3
+
+
 
 #define EFFECT_DISABLE_AFTER_ON     1
 #define EFFECT_DISABLE_AFTER_OFF    2

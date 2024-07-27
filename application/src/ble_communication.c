@@ -114,36 +114,23 @@ static void BLE_COM_parse_parameter_set(uint8_t* data, uint16_t len)
         case PARAM_SET_EFFECT:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=SET_EFFECT\r\n");
             uint8_t effect_number = data[1];
-           // if ( ( effect_number == 1 ) || ( effect_number == 2 ) ) // We alredy have only two effect. TODO: need refactor
-            //{
-                settings.selected_effect_number = effect_number;
-                SEGGER_RTT_printf(0, "BLE COM: SET_EFFECT=%d\r\n", effect_number);
-                printf("BLE COM: SET_EFFECT=%d\r\n", effect_number);
-            // }
-            // else
-            // {
-            //     SEGGER_RTT_printf(0, "Wrong effect number\r\n");
-            //     printf("Wrong effect number\r\n");
-            // }
 
-            // if ( effect_number == 1 )
-            // {
-            //     settings.effect1_settings_1 =  ( (uint16_t)data[2] << 8 ) | data[3];
-            //     settings.effect1_settings_2 =  ( (uint16_t)data[4] << 8 ) | data[5];
-            //     SEGGER_RTT_printf(0, "BLE COM: effect1_settings_1=%d\r\n", settings.effect1_settings_1 );
-            //     SEGGER_RTT_printf(0, "BLE COM: effect1_settings_2=%d\r\n", settings.effect1_settings_2 );
-            //     printf("BLE COM: effect1_settings_1=%d\r\n", settings.effect1_settings_1 );
-            //     printf("BLE COM: effect1_settings_2=%d\r\n", settings.effect1_settings_2 );
-            // }
-            // if ( effect_number == 2 ) // Effect 2 have only one setting
-            // {
-            //     settings.effect2_settings_1 =  ( (uint16_t)data[2] << 8 ) | data[3];
-            //     SEGGER_RTT_printf(0, "BLE COM: effect2_settings_1=%d\r\n", settings.effect2_settings_1 );
-            //     printf("BLE COM: effect1_settings_2=%d\r\n", settings.effect1_settings_1 );
-            // }
-            // TODO:
-            // wyslac settings do efektu
+            if ( effect_number >= TOTAL_EFFECT_NUMBER )
+            {
+                SEGGER_RTT_WriteString(0, "BLE COM: Wrong effect number\r\n");
+                printf("BLE COM: Wrong effect number\r\n");
+                return;
+            }
 
+            settings.selected_effect_number = effect_number;
+            SEGGER_RTT_printf(0, "BLE COM: SET_EFFECT=%d\r\n", effect_number);
+            printf("BLE COM: SET_EFFECT=%d\r\n", effect_number);
+
+            settings.effect_settings_1[settings.selected_effect_number] = ( (uint16_t)data[2] << 8 ) | data[3];
+            settings.effect_settings_2[settings.selected_effect_number] = ( (uint16_t)data[4] << 8 ) | data[5];
+            settings.effect_settings_3[settings.selected_effect_number] = ( (uint16_t)data[6] << 8 ) | data[7];
+
+            EFFECT_set_effect_settings();
         break; 
         case PARAM_SET_ALL_PARAM:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=SET_ALL_PARAM\r\n");
@@ -200,7 +187,7 @@ static void BLE_COM_parse_parameter_set(uint8_t* data, uint16_t len)
             SETTINGS_print_rtt();
             SETTINGS_print_serial();
 
-            uint8_t data_to_send[19];
+            uint8_t data_to_send[23];
 
             data_to_send[0] = COMMAND_SET_PARAMETER;
             data_to_send[1] = PARAM_SET_READ_ALL;
@@ -213,17 +200,21 @@ static void BLE_COM_parse_parameter_set(uint8_t* data, uint16_t len)
             data_to_send[8] = (uint8_t)(settings.stair_light_on_time_ms >> 16);
             data_to_send[9] = (uint8_t)(settings.stair_light_on_time_ms >> 8);
             data_to_send[10] = (uint8_t)(settings.stair_light_on_time_ms & 0xFF);
-            data_to_send[11] = settings.selected_effect_number;
-            data_to_send[12] = (uint8_t)(settings.effect_settings_1[settings.selected_effect_number] >> 8);
-            data_to_send[13] = (uint8_t)(settings.effect_settings_1[settings.selected_effect_number] & 0xFF);
-            data_to_send[14] = (uint8_t)(settings.effect_settings_2[settings.selected_effect_number] >> 8);
-            data_to_send[15] = (uint8_t)(settings.effect_settings_2[settings.selected_effect_number] & 0xFF);
-            data_to_send[16] = (uint8_t)(settings.effect_settings_3[settings.selected_effect_number] >> 8);
-            data_to_send[17] = (uint8_t)(settings.effect_settings_3[settings.selected_effect_number] & 0xFF);
+            data_to_send[11] = FW_VERSION;
+            data_to_send[12] = (uint8_t)( settings.reset_count >> 24 );
+            data_to_send[13] = (uint8_t)( settings.reset_count >> 16 );
+            data_to_send[14] = (uint8_t)( settings.reset_count >> 8 );
+            data_to_send[15] = (uint8_t)( settings.reset_count & 0xFF );
 
-            BLE_send(data_to_send, 18);
+            data_to_send[16] = settings.selected_effect_number;
+            data_to_send[17] = (uint8_t)(settings.effect_settings_1[settings.selected_effect_number] >> 8);
+            data_to_send[18] = (uint8_t)(settings.effect_settings_1[settings.selected_effect_number] & 0xFF);
+            data_to_send[19] = (uint8_t)(settings.effect_settings_2[settings.selected_effect_number] >> 8);
+            data_to_send[20] = (uint8_t)(settings.effect_settings_2[settings.selected_effect_number] & 0xFF);
+            data_to_send[21] = (uint8_t)(settings.effect_settings_3[settings.selected_effect_number] >> 8);
+            data_to_send[22] = (uint8_t)(settings.effect_settings_3[settings.selected_effect_number] & 0xFF);
 
-            // TODO Send data over BLE
+            BLE_send(data_to_send, 23);
         break;
         case PARAM_SET_LOAD_AND_SAVE_DEFAULT:
             SEGGER_RTT_WriteString(0, "BLE COM: PARAM=PARAM_SET_LOAD_AND_SAVE_DEFAULT\r\n");

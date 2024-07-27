@@ -25,11 +25,14 @@
 #define HEARTBEAT_PERIOD_MS 1000
 
 
+static btstack_packet_callback_registration_t hci_event_callback_registration;
+
 struct repeating_timer main_timer;
-struct repeating_timer io_pool_timer;
 
 static volatile uint32_t io_exp_pooling_counter = 0;
 static volatile bool io_exp_pooling_flag = false;
+
+
 
 
 bool main_timer_callback(struct repeating_timer *t) // each 2ms
@@ -149,24 +152,6 @@ void action_sensor_bottom(void)
 
 
 
-// // Related to bluetooth
-static btstack_timer_source_t heartbeat;
-static btstack_packet_callback_registration_t hci_event_callback_registration;
-
-static void heartbeat_handler(struct btstack_timer_source *ts) 
-{
-    static uint32_t counter = 0;
-    counter++;
-
-    // Invert the led
-    static int led_on = true;
-    led_on = !led_on;
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_on);
-
-    // Restart timer
-    btstack_run_loop_set_timer(ts, HEARTBEAT_PERIOD_MS);
-    btstack_run_loop_add_timer(ts);
-}
 
 
 
@@ -197,21 +182,14 @@ int main()
         printf("failed to initialise cyw43_arch\n");
         return -1;
     }
-
     l2cap_init();
     sm_init();
-
     att_server_init(profile_data, att_read_callback, att_write_callback);    
     // inform about BTstack state
     hci_event_callback_registration.callback = &packet_handler;
     hci_add_event_handler(&hci_event_callback_registration);
     // register for ATT event
     att_server_register_packet_handler(packet_handler);
-    // set one-shot btstack timer
-    heartbeat.process = &heartbeat_handler;
-    btstack_run_loop_set_timer(&heartbeat, HEARTBEAT_PERIOD_MS);
-    btstack_run_loop_add_timer(&heartbeat);
-
     // turn on bluetooth!
     hci_power_control(HCI_POWER_ON);
 
